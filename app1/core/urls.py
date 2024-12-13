@@ -11,12 +11,11 @@ from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Message
 from .serializers import MessageSerializer, UserSerializer
-from django.contrib.auth.models import User  # or from .models import User
-from rest_framework.generics import ListAPIView
+from django.contrib.auth.models import User  # Correct import
 
 # Root redirect
 def root_redirect(request):
-    return redirect('login')  # 'login' is the name of your login URL pattern
+    return redirect('login')
 
 # Dashboard
 class DashboardView(TemplateView):
@@ -51,7 +50,6 @@ class RegisterAPIView(APIView):
 # Login (Form-based)
 class LoginView(View):
     def get(self, request):
-        print("Rendering login page...")  # Debugging line
         return render(request, 'core/login.html')
 
     def post(self, request):
@@ -70,38 +68,13 @@ def logout_view(request):
     return redirect('login')
 
 # Messages (API-based)
-import requests
-
 class MessageView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
 
     def perform_create(self, serializer):
-        # Save the message in App 1
         serializer.save(sender=self.request.user)
-        
-        # Forward the message to App 2
-        message_data = {
-            'sender': self.request.user.id,
-            'receiver': serializer.validated_data['receiver'].id,
-            'content': serializer.validated_data['content'],
-        }
-
-        # URL of App 2's message endpoint (running on port 8002)
-        app2_url = 'http://127.0.0.1:8002/api/messages/'
-        
-        headers = {
-            'Content-Type': 'application/json',  # Ensure the correct content type
-        }
-        
-        # Send the message to App 2
-        response = requests.post(app2_url, json=message_data, headers=headers)
-        
-        if response.status_code == 201:
-            print("Message forwarded to App 2 successfully.")
-        else:
-            print(f"Failed to forward message to App 2. Status code: {response.status_code}")
 
 # Users API
 class UserListView(ListAPIView):
@@ -116,4 +89,30 @@ class MessageListView(ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Message.objects.filter(sender=user) | Message.objects.filter(receiver=user.username)
+        return Message.objects.filter(sender=user) | Message.objects.filter(receiver=user)
+
+# URL Patterns
+from django.urls import path
+from .views import (
+    MessageView, 
+    UserListView, 
+    MessageListView, 
+    DashboardView, 
+    RegisterFormView, 
+    RegisterAPIView, 
+    logout_view,
+    root_redirect,
+    LoginView
+)
+
+urlpatterns = [
+    path('', root_redirect, name='root_redirect'),
+    path('register/', RegisterFormView.as_view(), name='register_form'),
+    path('api/register/', RegisterAPIView.as_view(), name='register_api'),
+    path('login/', LoginView.as_view(), name='login'),
+    path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    path('messages/', MessageView.as_view(), name='messages'),
+    path('api/users/', UserListView.as_view(), name='user-list'),
+    path('api/messages/', MessageListView.as_view(), name='message-list'),
+    path('logout/', logout_view, name='logout'),
+]
