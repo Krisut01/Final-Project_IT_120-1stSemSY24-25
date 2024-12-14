@@ -1,32 +1,37 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Welcome to App 2 - Dashboard</h1>
+    <div class="dashboard-container">
+        <h1>Welcome to App 2 - Dashboard</h1>
 
-<h2>Your Messages</h2>
-<div class="messages">
-    <!-- Messages will be populated from the backend -->
-    {% for message in messages %}
-        <div class="message">
-            <p><strong>From:</strong> {{ message.sender.username }}</p>
-            <p><strong>To:</strong> {{ message.receiver.username }}</p>
-            <p><strong>Content:</strong> {{ message.content }}</p>
-            <p><strong>Time:</strong> {{ message.timestamp }}</p>
+        <h2>Your Messages</h2>
+        <div class="messages">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message">
+                        <p><strong>From:</strong> {{ message.sender.username }}</p>
+                        <p><strong>To:</strong> {{ message.receiver.username }}</p>
+                        <p><strong>Content:</strong> {{ message.content }}</p>
+                        <p><strong>Time:</strong> {{ message.timestamp }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No messages available.</p>
+            {% endif %}
         </div>
-    {% endfor %}
-</div>
 
-<h2>Send a New Message</h2>
-<form action="{% url 'send_message' %}" method="POST">
-    {% csrf_token %}
-    <div class="input-group">
-        <label for="receiver">Receiver:</label>
-        <input type="text" id="receiver" name="receiver" required>
+        <h2>Send a New Message</h2>
+        <form action="{% url 'send_message' %}" method="POST" class="send-message-form">
+            {% csrf_token %}
+            <div class="input-group">
+                <label for="receiver">Receiver:</label>
+                <input type="text" id="receiver" name="receiver" required>
+            </div>
+            <div class="input-group">
+                <label for="content">Message Content:</label>
+                <textarea id="content" name="content" required></textarea>
+            </div>
+            <button type="submit" class="btn">Send Message</button>
+        </form>
     </div>
-    <div class="input-group">
-        <label for="content">Message Content:</label>
-        <textarea id="content" name="content" required></textarea>
-    </div>
-    <button type="submit" class="btn">Send Message</button>
-</form>
 {% endblock %}

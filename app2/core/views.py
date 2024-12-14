@@ -8,24 +8,26 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListCreateAPIView, ListAPIView
-from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Message
 from .serializers import MessageSerializer, UserSerializer
-from django.contrib.auth.models import User  # or from .models import User
-from rest_framework.generics import ListAPIView
+from django.contrib.auth.models import User
+from django.db.models import Q
+import requests
+
+from rest_framework.permissions import IsAuthenticated
 
 # Root redirect
 def root_redirect(request):
-    return redirect('login')  # 'login' is the name of your login URL pattern
+    return redirect('login')
 
-# Dashboard
+# Dashboard View (Display messages)
 class DashboardView(View):
     def get(self, request):
         user = request.user
-        messages = Message.objects.filter(sender=user) | Message.objects.filter(receiver=user)
-        return render(request, 'dashboard.html', {'messages': messages})
+        messages = Message.objects.filter(Q(sender=user) | Q(receiver=user))
+        return render(request, 'core/dashboard.html', {'messages': messages})
 
-# Registration (Form-based)
+# Register (Form-based)
 class RegisterFormView(View):
     def get(self, request):
         return render(request, 'core/register.html')
@@ -41,7 +43,7 @@ class RegisterFormView(View):
         User.objects.create_user(username=username, email=email, password=password)
         return redirect('login')
 
-# Registration (API-based)
+# Register API (JSON-based)
 class RegisterAPIView(APIView):
     def post(self, request):
         username = request.data.get('username')
@@ -51,10 +53,9 @@ class RegisterAPIView(APIView):
         User.objects.create_user(username=username, password=password)
         return Response({'message': 'User registered successfully'}, status=status.HTTP_201_CREATED)
 
-# Login (Form-based)
+# Login View
 class LoginView(View):
     def get(self, request):
-        print("Rendering login page...")  # Debugging line
         return render(request, 'core/login.html')
 
     def post(self, request):
@@ -72,51 +73,37 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
-# Messages (API-based)
-import requests
-
-class MessageView(ListCreateAPIView):
+class MessageView(APIView):
     permission_classes = [IsAuthenticated]
-    queryset = Message.objects.all()
-    serializer_class = MessageSerializer
 
-    def perform_create(self, serializer):
-        # Save the message in App 1
-        serializer.save(sender=self.request.user)
-        
-        # Forward the message to App 2
-        message_data = {
-            'sender': self.request.user.id,
-            'receiver': serializer.validated_data['receiver'].id,
-            'content': serializer.validated_data['content'],
-        }
+    # Get the list of messages for the current user
+    def get(self, request):
+        user = request.user
+        messages = Message.objects.filter(Q(sender=user) | Q(receiver=user))
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data)
 
-        # URL of App 2's message endpoint (running on port 8002)
-        app2_url = 'http://127.0.0.1:8002/api/messages/'
-        
-        headers = {
-            'Content-Type': 'application/json',  # Ensure the correct content type
-        }
-        
-        # Send the message to App 2
-        response = requests.post(app2_url, json=message_data, headers=headers)
-        
-        if response.status_code == 201:
-            print("Message forwarded to App 2 successfully.")
-        else:
-            print(f"Failed to forward message to App 2. Status code: {response.status_code}")
+    # Create a new message
+    def post(self, request):
+        sender = request.user
+        receiver_username = request.data.get('receiver')
+        content = request.data.get('content')
 
-# Users API
-class UserListView(ListAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+        try:
+            receiver = User.objects.get(username=receiver_username)
+            message = Message.objects.create(sender=sender, receiver=receiver, content=content)
+            serializer = MessageSerializer(message)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except User.DoesNotExist:
+            return Response({"detail": "Receiver user not found."}, status=status.HTTP_404_NOT_FOUND)
 
-# Messages API
+
+# Messages List View (for user-specific messages)
 class MessageListView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = MessageSerializer
 
     def get_queryset(self):
         user = self.request.user
-        return Message.objects.filter(sender=user) | Message.objects.filter(receiver=user.username)
+        return Message.objects.filter(Q(sender=user) | Q(receiver=user))
+

@@ -10,6 +10,23 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Fetch the encryption key from the environment
+FERNET_KEY = os.getenv("FERNET_KEY")
+
+# Ensure the key is loaded
+if not FERNET_KEY:
+    raise ValueError("Fernet key is missing in the .env file")
+
+
+
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -34,13 +51,18 @@ LOGIN_URL = '/login/'  # Redirect unauthorized users to login page
 LOGIN_REDIRECT_URL = '/dashboard/'  # Redirect after login
 LOGOUT_REDIRECT_URL = '/login/'  # Redirect after logout
 
-
+CSRF_COOKIE_NAME = "csrftoken"
+CSRF_COOKIE_HTTPONLY = False
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
+
 
 from datetime import timedelta
 
@@ -57,12 +79,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core'
+    'core',
     'corsheaders',
 ]
 
+
+
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:8002',
+    'http://127.0.0.1:8000',
 ]
 
 MIDDLEWARE = [
@@ -73,7 +98,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'core.middleware.EncryptMiddleware',
+    'core.middleware.EncryptionMiddleware', 
+    'corsheaders.middleware.CorsMiddleware',
+  
 ]
 
 ROOT_URLCONF = 'app1.urls'

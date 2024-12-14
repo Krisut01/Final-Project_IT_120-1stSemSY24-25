@@ -10,35 +10,70 @@ body {
     background-color: #f4f4f9;
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
 }
 
-/* Form container */
-.form-container {
+/* Dashboard Container */
+.dashboard-container {
     width: 100%;
-    max-width: 400px;
+    max-width: 1000px;
     padding: 20px;
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
+    margin-top: 20px;
 }
 
-.form-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* Heading */
+h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 20px;
 }
 
 h2 {
     font-size: 2rem;
-    margin-bottom: 20px;
     color: #333;
+    margin-bottom: 20px;
 }
 
-.form-group {
+/* Messages Section */
+.messages {
+    margin-bottom: 30px;
+}
+
+.message {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.message strong {
+    color: #007bff;
+}
+
+/* Send Message Form */
+.send-message-form {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-group {
     width: 100%;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 label {
@@ -46,33 +81,38 @@ label {
     color: #333;
 }
 
-input {
+textarea, input {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     font-size: 1rem;
     border: 1px solid #ccc;
     border-radius: 5px;
     margin-top: 5px;
 }
 
-input:focus {
+textarea:focus, input:focus {
     border-color: #007bff;
     outline: none;
 }
 
-/* Button */
-.btn {
+textarea {
+    height: 150px;
+    resize: vertical;
+}
+
+button {
     background-color: #007bff;
     color: #fff;
-    padding: 12px;
+    padding: 12px 25px;
     font-size: 1rem;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+    width: 100%;
 }
 
-.btn:hover {
+button:hover {
     background-color: #0056b3;
 }
 

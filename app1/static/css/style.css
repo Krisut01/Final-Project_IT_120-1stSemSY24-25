@@ -11,83 +11,87 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    margin: 0;
 }
 
-/* Form container */
-.form-container {
-    width: 100%;
-    max-width: 400px;
+.container {
+    width: 90%;
+    max-width: 800px;
     padding: 20px;
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
 
-.form-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* Sections */
+.section {
+    margin-bottom: 30px;
 }
 
-h2 {
-    font-size: 2rem;
-    margin-bottom: 20px;
+h1, h2, h3 {
+    margin-bottom: 15px;
     color: #333;
 }
 
-.form-group {
+table {
     width: 100%;
+    border-collapse: collapse;
     margin-bottom: 15px;
 }
 
-label {
-    font-size: 1rem;
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f9;
     color: #333;
 }
 
-input {
+/* Form Styles */
+.send-message-form input, .send-message-form textarea {
     width: 100%;
     padding: 10px;
-    font-size: 1rem;
+    margin-bottom: 10px;
     border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-top: 5px;
+    border-radius: 4px;
 }
 
-input:focus {
-    border-color: #007bff;
-    outline: none;
-}
-
-/* Button */
-.btn {
-    background-color: #007bff;
-    color: #fff;
+.send-message-form button {
+    width: 100%;
     padding: 12px;
-    font-size: 1rem;
+    background-color: #007BFF;
+    color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
-.btn:hover {
+.send-message-form button:hover {
     background-color: #0056b3;
 }
 
-/* Links */
-.switch-form {
-    margin-top: 15px;
-    font-size: 0.9rem;
-    color: #333;
+/* Inbox Styles */
+.inbox-message {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
 }
 
-.switch-form a {
-    color: #007bff;
-    text-decoration: none;
+.inbox-message img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
 }
 
-.switch-form a:hover {
-    text-decoration: underline;
-}

@@ -1,10 +1,10 @@
 from django.utils.deprecation import MiddlewareMixin
 from cryptography.fernet import Fernet
 
-class EncryptionMiddleware(MiddlewareMixin):
+class EncryptMiddleware(MiddlewareMixin):
     def __init__(self, get_response):
         self.get_response = get_response
-        self.cipher = Fernet(b'your-fernet-key-goes-here')
+        self.cipher = Fernet(b'your-fernet-key-goes-here')  # Replace with your actual key
 
     def process_request(self, request):
         if request.body:
