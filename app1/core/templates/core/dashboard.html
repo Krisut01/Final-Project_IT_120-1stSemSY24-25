@@ -5,85 +5,7 @@
     {% load static %}
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <style>
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .section {
-            margin-bottom: 30px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f5f5f5;
-        }
-        .send-message-form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        input, textarea {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-        button {
-            padding: 8px 16px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .error {
-            color: red;
-            margin-bottom: 10px;
-            padding: 10px;
-            background-color: #ffe6e6;
-            border-radius: 4px;
-            display: none;
-        }
-        .success {
-            color: green;
-            margin-bottom: 10px;
-            padding: 10px;
-            background-color: #e6ffe6;
-            border-radius: 4px;
-            display: none;
-        }
-        .message-row {
-            transition: background-color 0.3s;
-        }
-        .message-row:hover {
-            background-color: #f8f9fa;
-        }
-        .message-content {
-            max-width: 300px;
-            overflow-wrap: break-word;
-        }
-        .timestamp {
-            font-size: 0.9em;
-            color: #666;
-        }
-    </style>
+   
 </head>
 <body>
     <div class="container">
@@ -115,6 +37,7 @@
                         <th>To</th>
                         <th>Message</th>
                         <th>Time</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="messages-table"></tbody>
@@ -138,133 +61,9 @@
         </form>
     </div>
 
+    <script src="{% static 'script/send_message.js' %}"></script>
     <script>
-        function showError(message) {
-            const errorDiv = document.getElementById('error-message');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
-            setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
-        }
-
-        function showSuccess(message) {
-            const successDiv = document.getElementById('success-message');
-            successDiv.textContent = message;
-            successDiv.style.display = 'block';
-            setTimeout(() => { successDiv.style.display = 'none'; }, 5000);
-        }
-
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        }
-
-        async function loadMessages() {
-    try {
-        const token = localStorage.getItem('jwtToken') || getCookie('jwt_token');
-        if (!token) {
-            window.location.href = '/login/';
-            return;
-        }
-
-        const response = await axios.get('/api/messages/', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        const messagesTable = document.getElementById('messages-table');
-        messagesTable.innerHTML = '';
         
-        response.data.forEach(message => {
-            const row = document.createElement('tr');
-            row.className = 'message-row';
-            row.innerHTML = `
-                <td>${message.sender}</td>
-                <td>${message.receiver}</td>
-                <td class="message-content">${message.displayed_content || 'Error: Could not decrypt message'}</td>
-                <td class="timestamp">${new Date(message.timestamp).toLocaleString()}</td>
-            `;
-            messagesTable.appendChild(row);
-        });
-    } catch (error) {
-        console.error('Error loading messages:', error);
-        if (error.response?.status === 401) {
-            window.location.href = '/login/';
-        } else {
-            showError('Error loading messages: ' + (error.response?.data?.error || error.message));
-        }
-    }
-}
-
-        async function loadActiveUsers() {
-            const messages = await loadMessages();
-            if (!messages) return;
-
-            const uniqueUsers = new Set();
-            messages.forEach(message => {
-                uniqueUsers.add(message.sender);
-                uniqueUsers.add(message.receiver);
-            });
-
-            const usersTable = document.getElementById('users-table');
-            usersTable.innerHTML = '';
-            
-            Array.from(uniqueUsers).forEach(username => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${username}</td>
-                    <td><button onclick="startChat('${username}')">Message</button></td>
-                `;
-                usersTable.appendChild(row);
-            });
-        }
-
-        function startChat(username) {
-            document.getElementById('receiver').value = username;
-            document.getElementById('content').focus();
-        }
-
-        async function sendMessage(event) {
-    event.preventDefault();
-    const receiver = document.getElementById('receiver').value;
-    const content = document.getElementById('content').value;
-    const token = localStorage.getItem('jwtToken') || getCookie('jwt_token');
-
-    try {
-        const response = await axios.post('/api/send-message/', {
-            receiver,
-            content
-        }, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (response.status === 201) {
-            showSuccess('Message sent successfully');
-            loadMessages();  // Refresh messages
-        }
-    } catch (error) {
-        console.error('Send message error:', error);
-        showError('Failed to send message: ' + (error.response?.data?.error || error.message));
-    }
-}
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async function() {
-            const token = localStorage.getItem('jwtToken') || getCookie('jwt_token');
-            if (!token) {
-                window.location.href = '/login/';
-                return;
-            }
-
-            document.getElementById('sendMessageForm').addEventListener('submit', sendMessage);
-            
-            await loadMessages();
-            await loadActiveUsers();
-            
-            // Auto refresh
-            setInterval(async () => {
-                await loadMessages();
-                await loadActiveUsers();
-            }, 10000);
-        });
     </script>
 </body>
 </html>
