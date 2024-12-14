@@ -10,10 +10,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListCreateAPIView, ListAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Message
+from django.db import models  # Add this import
 from .serializers import MessageSerializer, UserSerializer
 from django.contrib.auth.models import User
 from cryptography.fernet import Fernet
 import os
+from django.db import models
+
 import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -32,14 +35,26 @@ def root_redirect(request):
 # Dashboard
 class DashboardView(TemplateView):
     template_name = 'core/dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['username'] = self.request.user.username
+        return context
     
-class UserListView(APIView):
+class UserDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        except User.DoesNotExist:
+            return Response(
+                {'error': 'User not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 # Registration (Form-based)
 class RegisterFormView(View):
@@ -82,11 +97,29 @@ class LoginView(View):
             # Generate JWT token after successful login
             refresh = RefreshToken.for_user(user)
             access_token = str(refresh.access_token)
-            response = JsonResponse({'access_token': access_token})
-            response.set_cookie('jwt_token', access_token)  # Store token in cookie for session
-            return redirect('/dashboard')  # Redirect to the dashboard after successful login
+            
+            # Create the response with the token in both cookie and JSON
+            response = JsonResponse({
+                'status': 'success',
+                'access_token': access_token,
+                'redirect_url': '/dashboard/'
+            })
+            
+            # Set token in cookie (httponly=False allows JavaScript access)
+            response.set_cookie(
+                'jwt_token', 
+                access_token,
+                max_age=3600,  # 1 hour
+                httponly=False,  # Allow JavaScript access
+                samesite='Lax'
+            )
+            
+            return response
 
-        return JsonResponse({'error': 'Invalid credentials'}, status=400)
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid credentials'
+        }, status=400)
 
 # Logout
 def logout_view(request):
@@ -126,88 +159,65 @@ class MessageView(ListCreateAPIView):
             print(f"Failed to forward message to App 2. Status code: {response.status_code}")
 
 # Users API
-class MessageListView(ListAPIView):
+class MessageListView(APIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = MessageSerializer
 
-    def get_queryset(self):
-        user = self.request.user
-        queryset = Message.objects.filter(sender=user) | Message.objects.filter(receiver=user)
+    def get(self, request):
+        try:
+            messages = Message.objects.filter(
+                models.Q(sender=request.user) | models.Q(receiver=request.user)
+            ).order_by('-timestamp')
+            
+            serializer = MessageSerializer(messages, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            print(f"Error in MessageListView: {str(e)}")
+            return Response(
+                {'error': 'Failed to retrieve messages'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
-        cipher = self.get_cipher()
-        for message in queryset:
-            message.content = message.decrypt_content(cipher)
-        return queryset
-
-    def get_cipher(self):
-        key = os.getenv('FERNET_KEY')
-        if not key:
-            raise ValueError("FERNET_KEY is not set in the environment variables.")
-        return Fernet(key.encode())
-
-# Messages (API-based)
 class SendMessageAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        receiver_username = request.data.get('receiver')
-        content = request.data.get('content')
-
-        if not receiver_username or not content:
-            return Response({'error': 'Receiver and content are required'}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
-            receiver = User.objects.get(username=receiver_username)
-        except User.DoesNotExist:
-            return Response({'error': 'Receiver not found'}, status=status.HTTP_404_NOT_FOUND)
+            key = os.getenv('FERNET_KEY')
+            if not key:
+                return Response(
+                    {'error': 'Encryption key not found'}, 
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
-        message = Message.objects.create(sender=request.user, receiver=receiver, content=content)
+            # Process request data
+            receiver_username = request.data.get('receiver')
+            content = request.data.get('content')
 
-        message_data = {
-            'sender': request.user.id,
-            'receiver': receiver.id,
-            'content': content,
-        }
+            # Validate data
+            if not receiver_username or not content:
+                return Response(
+                    {'error': 'Receiver and content are required'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        # Ensure token is being passed and decoded correctly
-        token = request.headers.get('Authorization')
-        if not token:
-            return Response({'error': 'Authentication token missing'}, status=status.HTTP_401_UNAUTHORIZED)
+            receiver = User.objects.filter(username=receiver_username).first()
+            if not receiver:
+                return Response(
+                    {'error': 'Receiver not found'}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
-        try:
-            token = token.split(' ')[1]  # Extract Bearer token
-        except IndexError:
-            return Response({'error': 'Invalid token format'}, status=status.HTTP_401_UNAUTHORIZED)
+            # Create and save the message
+            message = Message(sender=request.user, receiver=receiver, content=content)
+            message.save()
 
-        # Validate the token using the JWT library (assuming you are using `rest_framework_simplejwt`)
-        try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-            user = User.objects.get(id=payload['user_id'])
-        except jwt.ExpiredSignatureError:
-            return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
-        except jwt.InvalidTokenError:
-            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json',
-        }
-
-        app1_url = 'http://127.0.0.1:8000/api/messages/'
-        app2_url = 'http://127.0.0.1:8002/api/messages/'
-
-        try:
-            response_app1 = requests.post(app1_url, json=message_data, headers=headers)
-            if response_app1.status_code != 201:
-                return Response({'error': 'Failed to send message to App 1'}, status=status.HTTP_400_BAD_REQUEST)
-        except requests.exceptions.RequestException as e:
-            return Response({'error': f'Error sending message to App 1: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        try:
-            response_app2 = requests.post(app2_url, json=message_data, headers=headers)
-            if response_app2.status_code != 201:
-                return Response({'error': 'Failed to forward message to App 2'}, status=status.HTTP_400_BAD_REQUEST)
-        except requests.exceptions.RequestException as e:
-            return Response({'error': f'Error forwarding message to App 2: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return Response({'message': 'Message sent successfully'}, status=status.HTTP_201_CREATED)
+            return Response(
+                {'message': 'Message sent successfully'}, 
+                status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            print(f"Error in SendMessageAPIView: {str(e)}")
+            return Response(
+                {'error': 'Failed to send message'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

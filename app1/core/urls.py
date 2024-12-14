@@ -1,8 +1,8 @@
 # URL Patterns
 from django.urls import path
 from .views import (
-    MessageView, 
-    UserListView, 
+    # MessageView, 
+    UserDetailView, 
     MessageListView, 
     DashboardView, 
     RegisterFormView, 
@@ -19,8 +19,8 @@ urlpatterns = [
     path('api/register/', RegisterAPIView.as_view(), name='register_api'),
     path('login/', LoginView.as_view(), name='login'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
-    path('messages/', MessageView.as_view(), name='messages'),
-    path('api/users/', UserListView.as_view(), name='user-list'),
+    # path('messages/', MessageView.as_view(), name='messages'),
+    path('api/users/<int:user_id>/', UserDetailView.as_view(), name='user-detail'),
     path('api/messages/', MessageListView.as_view(), name='message-list'),
     path('api/send-message/',SendMessageAPIView.as_view(), name='send-message'),
     path('logout/', logout_view, name='logout'),

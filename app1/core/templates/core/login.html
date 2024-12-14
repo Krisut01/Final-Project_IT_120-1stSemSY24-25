@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    {% load static %}  <!-- Add this line to load static files -->
+    {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
-
     <div class="form-container">
         <div class="form-box">
             <h2>Login</h2>
-            <form method="POST" action="{% url 'login' %}">
+            <form id="loginForm">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="username">Username</label>
@@ -24,10 +24,39 @@
                 </div>
                 <button type="submit" class="btn">Login</button>
             </form>
-
             <p class="switch-form">Don't have an account? <a href="{% url 'register_form' %}">Register</a></p>
         </div>
     </div>
 
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('{% url "login" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Store token in localStorage
+                    localStorage.setItem('jwtToken', data.access_token);
+                    // Redirect to dashboard
+                    window.location.href = data.redirect_url;
+                } else {
+                    alert(data.message || 'Login failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during login');
+            });
+        });
+    </script>
 </body>
 </html>
