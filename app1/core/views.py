@@ -16,6 +16,8 @@ from django.contrib.auth.models import User
 from cryptography.fernet import Fernet
 import os
 from django.db import models
+from django.urls import path
+from . import views
 
 import requests
 from rest_framework.views import APIView
@@ -221,3 +223,13 @@ class SendMessageAPIView(APIView):
                 {'error': 'Failed to send message'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class DeleteMessageView(APIView):
+    def delete(self, request, message_id):
+        try:
+            message = Message.objects.get(id=message_id)
+            message.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Message.DoesNotExist:
+            return Response({'error': 'Message not found'}, status=status.HTTP_404_NOT_FOUND)

@@ -10,7 +10,8 @@ from .views import (
     logout_view,
     root_redirect,
     LoginView,
-    SendMessageAPIView
+    SendMessageAPIView,
+    DeleteMessageView
 )
 
 urlpatterns = [
@@ -23,6 +24,8 @@ urlpatterns = [
     path('api/users/<int:user_id>/', UserDetailView.as_view(), name='user-detail'),
     path('api/messages/', MessageListView.as_view(), name='message-list'),
     path('api/send-message/',SendMessageAPIView.as_view(), name='send-message'),
+    path('api/messages/<int:message_id>/',DeleteMessageView.as_view(), name='delete_message'),
+
     path('logout/', logout_view, name='logout'),
 ]
 
