@@ -130,6 +130,27 @@ async function loadMessages() {
     }
 }
 
+document.addEventListener('DOMContentLoaded', async function() {
+    const token = getJWTToken();
+    if (!token) {
+        window.location.href = '/login/';
+        return;
+    }
+
+    await loadMessages();
+    await loadActiveUsers();
+    
+    // Auto refresh messages every 10 seconds
+    setInterval(async () => {
+        await loadMessages();
+    }, 10000);
+    
+    // Auto refresh active users every 30 seconds
+    setInterval(async () => {
+        await loadActiveUsers();
+    }, 30000);
+});
+
 async function loadActiveUsers() {
     const token = getJWTToken();
     if (!token) {
@@ -199,9 +220,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     await loadMessages();
     await loadActiveUsers();
     
-    // Auto refresh
+    // Auto refresh messages every 10 seconds
     setInterval(async () => {
         await loadMessages();
-        await loadActiveUsers();
     }, 10000);
+    
+    // Auto refresh active users every 30 seconds
+    setInterval(async () => {
+        await loadActiveUsers();
+    }, 30000);
 });
