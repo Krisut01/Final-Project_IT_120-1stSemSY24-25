@@ -1,0 +1,54 @@
+# Documentation for Applications
+
+## Introduction
+This document provides a comprehensive step-by-step guide on how to set up, run, and access the applications `@[app1]` and `@[app2]`. This guide is intended for developers and users who wish to deploy and interact with these applications.
+
+## Application Overview
+### `@[app1]`
+- **Directory**: `c:/laragon/www/PROJECTFINALS/MESSAGE-120(GIT)/TESTINGPHASE/Experiment/app1`
+- **Description**: Briefly describe the purpose and functionality of `@[app1]`.
+
+### `@[app2]`
+- **Directory**: `c:/laragon/www/PROJECTFINALS/MESSAGE-120(GIT)/TESTINGPHASE/Experiment/app2`
+- **Description**: Briefly describe the purpose and functionality of `@[app2]`.
+
+## Setup and Installation
+To prepare the applications for use, follow these steps:
+
+1. **Navigate to the Application Directory**:
+   - Open your terminal or command prompt.
+   - Change to the application directory using the command:
+     ```bash
+     cd c:/laragon/www/PROJECTFINALS/MESSAGE-120(GIT)/TESTINGPHASE/Experiment/app1  # For app1
+     cd c:/laragon/www/PROJECTFINALS/MESSAGE-120(GIT)/TESTINGPHASE/Experiment/app2  # For app2
+     ```
+
+2. **Install Dependencies**:
+   - Ensure you have Python and pip installed.
+   - Install the required dependencies by running:
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+## Running the Applications
+To start the applications, execute the following commands:
+
+1. **For `@[app1]`**:
+   ```bash
+   cd c:/laragon/www/PROJECTFINALS/MESSAGE-120(GIT)/TESTINGPHASE/Experiment/app1
+   python manage.py runserver
+   ```
+
+2. **For `@[app2]`**:
+   ```bash
+   cd c:/laragon/www/PROJECTFINALS/MESSAGE-120(GIT)/TESTINGPHASE/Experiment/app2
+   python manage.py runserver 8002
+   ```
+
+## Accessing the Applications
+- Once the applications are running, open your web browser and navigate to:
+  - `http://localhost:8000` for `@[app1]`
+  - `http://localhost:8002` for `@[app2]`
+
+
+"Wait for App2 to load, or refresh it to ensure the login is applied. Due to some slow configurations in the background, it may take some time to fully load."
