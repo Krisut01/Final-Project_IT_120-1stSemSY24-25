@@ -1,37 +1,69 @@
-{% extends 'base.html' %}
-
-{% block content %}
-    <div class="dashboard-container">
-        <h1>Welcome to App 2 - Dashboard</h1>
-
-        <h2>Your Messages</h2>
-        <div class="messages">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="message">
-                        <p><strong>From:</strong> {{ message.sender.username }}</p>
-                        <p><strong>To:</strong> {{ message.receiver.username }}</p>
-                        <p><strong>Content:</strong> {{ message.content }}</p>
-                        <p><strong>Time:</strong> {{ message.timestamp }}</p>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No messages available.</p>
-            {% endif %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    {% load static %}
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+   
+</head>
+<body>
+    <div class="container">
+        <h1>App2</h1>
+        <div id="error-message" class="error"></div>
+        <div id="success-message" class="success"></div>
+        
+        <!-- Users Section -->
+        <div class="section">
+            <h2>Active Users</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table"></tbody>
+            </table>
         </div>
 
-        <h2>Send a New Message</h2>
-        <form action="{% url 'send_message' %}" method="POST" class="send-message-form">
+        <!-- Messages Section -->
+        <div class="section">
+            <h2>Messages</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Message</th>
+                        <th>Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="messages-table"></tbody>
+            </table>
+        </div>
+
+        <!-- Send Message Section -->
+        <div class="section">
+            <h3>Send a Message</h3>
+            <form id="sendMessageForm" class="send-message-form">
+                <input type="text" id="receiver" placeholder="Receiver's Username" required>
+                <textarea id="content" rows="4" placeholder="Type your message..." required></textarea>
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+
+        <!-- Logout Button -->
+        <form id="logoutForm" action="{% url 'logout' %}" method="post">
             {% csrf_token %}
-            <div class="input-group">
-                <label for="receiver">Receiver:</label>
-                <input type="text" id="receiver" name="receiver" required>
-            </div>
-            <div class="input-group">
-                <label for="content">Message Content:</label>
-                <textarea id="content" name="content" required></textarea>
-            </div>
-            <button type="submit" class="btn">Send Message</button>
+            <button type="submit">Logout</button>
         </form>
     </div>
-{% endblock %}
+
+    <script src="{% static 'script/send_message.js' %}"></script>
+    <script>
+        
+    </script>
+</body>
+</html>

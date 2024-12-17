@@ -37,7 +37,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-d^03v@2oio=5k@+*2c3ld382y_-1a$e%4mwt1@xd*=*v0&+)xq'
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from the .env file
+load_dotenv()
+
+# Use the SECRET_KEY from the .env file
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+# Optional: Use DEBUG from .env
+DEBUG = os.getenv('DEBUG') == 'True'
+
+
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -81,7 +94,20 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'corsheaders',
+    'rest_framework',
+    'channels'
 ]
+
+
+
+ASGI_APPLICATION = 'app1.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    }
+}
+
 
 
 

@@ -28,7 +28,11 @@ from django.contrib.auth.models import User
 from .models import Message
 import jwt
 from django.conf import settings
-import requests
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Message
+from django.contrib.auth.models import User
 
 # Root redirect
 def root_redirect(request):
@@ -57,6 +61,7 @@ class UserDetailView(APIView):
                 {'error': 'User not found'}, 
                 status=status.HTTP_404_NOT_FOUND
             )
+
 
 # Registration (Form-based)
 class RegisterFormView(View):
@@ -156,9 +161,9 @@ class MessageView(ListCreateAPIView):
         response = requests.post(app2_url, json=message_data, headers=headers)
         
         if response.status_code == 201:
-            print("Message forwarded to App 2 successfully.")
+            print("Message forwarded to App 1 successfully.")
         else:
-            print(f"Failed to forward message to App 2. Status code: {response.status_code}")
+            print(f"Failed to forward message to App 1. Status code: {response.status_code}")
 
 # Users API
 class MessageListView(APIView):
@@ -171,13 +176,39 @@ class MessageListView(APIView):
             ).order_by('-timestamp')
             
             serializer = MessageSerializer(messages, many=True)
-            return Response(serializer.data)
+            return Response(serializer.data)  # Return JSON data
         except Exception as e:
             print(f"Error in MessageListView: {str(e)}")
             return Response(
                 {'error': 'Failed to retrieve messages'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+class ReceiveMessageAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        sender_id = request.data.get('sender')
+        receiver_username = request.data.get('receiver')
+        content = request.data.get('content')
+
+        try:
+            sender = User.objects.get(id=sender_id)
+            receiver = User.objects.get(username=receiver_username)
+
+            # Create and save the message
+            message = Message(sender=sender, receiver=receiver, content=content)
+            message.save()
+            print(f"Message saved: {message.content} from {sender.username} to {receiver.username}")
+
+            return Response({'message': 'Message received successfully'}, status=status.HTTP_201_CREATED)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error saving message: {str(e)}")
+            return Response({'error': 'Failed to save message'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 
 class SendMessageAPIView(APIView):
     permission_classes = [IsAuthenticated]

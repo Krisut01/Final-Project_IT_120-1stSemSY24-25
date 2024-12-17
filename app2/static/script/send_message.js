@@ -107,7 +107,7 @@ async function loadMessages() {
     }
 
     try {
-        const response = await fetch("http://127.0.0.1:8002/api/messages/", {
+        const response = await fetch("http://127.0.0.1:8000/api/messages/", {
             headers: { 
                 "Authorization": `Bearer ${token}`,
                 "Content-Type": "application/json"
@@ -203,7 +203,7 @@ function deleteMessage(messageId, app) {
     }
 
     // Determine the correct URL based on the app parameter
-    const baseUrl = app === 'app1' ? 'http://127.0.0.1:8000' : 'http://127.0.0.1:8002';
+    const baseUrl = app === 'app2' ? 'http://127.0.0.1:8002' : 'http://127.0.0.1:8000';
     const url = `${baseUrl}/api/messages/${messageId}/`;
 
     axios.delete(url, {

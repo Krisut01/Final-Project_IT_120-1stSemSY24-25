@@ -10,6 +10,23 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Fetch the encryption key from the environment
+FERNET_KEY = os.getenv("FERNET_KEY")
+
+# Ensure the key is loaded
+if not FERNET_KEY:
+    raise ValueError("Fernet key is missing in the .env file")
+
+
+
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,7 +37,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1mlfpa5yc3s$5hkg$^84@=abg9t(k43k&ubq6b%di(-)ertg^g'
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from the .env file
+load_dotenv()
+
+# Use the SECRET_KEY from the .env file
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+# Optional: Use DEBUG from .env
+DEBUG = os.getenv('DEBUG') == 'True'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -34,11 +61,18 @@ LOGIN_URL = '/login/'  # Redirect unauthorized users to login page
 LOGIN_REDIRECT_URL = '/dashboard/'  # Redirect after login
 LOGOUT_REDIRECT_URL = '/login/'  # Redirect after logout
 
+CSRF_COOKIE_NAME = "csrftoken"
+CSRF_COOKIE_HTTPONLY = False
+
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
+
 
 from datetime import timedelta
 
@@ -46,6 +80,18 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
+
+
+ASGI_APPLICATION = 'app2.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    }
+}
+
+
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -53,13 +99,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
     'core',
+    'corsheaders',
+    'rest_framework',
+    'channels'
+    
 ]
 
+
+
 CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:8002',
     'http://127.0.0.1:8000',
 ]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -68,10 +121,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'core.middleware.EncryptMiddleware',
+    'core.middleware.EncryptionMiddleware', 
     'corsheaders.middleware.CorsMiddleware',
-    
-    
+  
 ]
 
 ROOT_URLCONF = 'app2.urls'
@@ -80,7 +132,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-             BASE_DIR / "templates",
+             BASE_DIR / "templates", 
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -142,7 +194,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+# If your CSS and other static files are located in the root directory (same level as `manage.py`), then configure the static directories like this:
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # Directory containing static files
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
