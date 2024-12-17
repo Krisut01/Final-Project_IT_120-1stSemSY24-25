@@ -52,3 +52,41 @@ To start the applications, execute the following commands:
 
 
 "Wait for App2 to load, or refresh it to ensure the login is applied. Due to some slow configurations in the background, it may take some time to fully load."
+
+
+
+
+how to make changes?
+first create a new branch where you can edit or add somehing
+
+
+
+
+
+For co
+# 1. Clone the Repository
+# Clone the repo (if they don’t have it locally):
+git clone https://github.com/Krisut01/ForSubmission.git
+
+# Navigate to the repository directory:
+cd your-repository
+
+# 2. Create a New Branch for Your  Work
+#  should create a new branch for each feature or bug fix u  work on. This prevents any direct changes to the main branch.
+
+# Create a new branch:
+git checkout -b feature-branch-name
+
+# Example: If u r working on a login feature, they might name the branch login-feature.
+
+# 3. Make Changes and Commit Them
+# They will then work on their feature or bug fix. After making changes, they need to commit their changes.
+
+# Check the status of changes:
+git status
+
+# Stage the changes:
+git add .
+
+# Commit the changes:
+git commit -m "Describe the changes made"
