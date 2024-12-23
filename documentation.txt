@@ -58,6 +58,10 @@ The Secure Messaging System consists of two interconnected Django applications (
 - Encrypted message storage
 - Middleware encryption layer
 
+
+
+pip install -r requirements.txt
+
 ### 4.2 Authentication
 - JWT token-based authentication
 - Secure password handling
