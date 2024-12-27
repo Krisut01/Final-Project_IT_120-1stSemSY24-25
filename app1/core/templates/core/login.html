@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login - ChatHive</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
-<body>
+<body style="background: url('{% static 'images/chathivebackground.png' %}') no-repeat center center fixed; background-size: cover;">
     <div class="form-container">
         <div class="form-box">
-            <h2>App1</h2>
+            <!-- Display the logo here -->
+            <img src="{% static 'images/chathivelogo.png' %}" alt="ChatHive Logo" style="display: block; margin: 0 auto; height: 60px; margin-bottom: 20px;">
+            <h2>ChatHive 1</h2>
             <form id="loginForm">
                 {% csrf_token %}
                 <div class="form-group">

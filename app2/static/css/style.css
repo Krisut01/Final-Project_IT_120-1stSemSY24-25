@@ -1,50 +1,95 @@
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: rgb(0, 0, 0);
 }
+main {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* Adjust ratio as needed */
+    gap: 10px;
+    margin-bottom: 0px;
+}
+
+.container, .form-box {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(163, 0, 109, 0.2);
+    color: rgb(244, 0, 203);
+}
+
+h1, h2, h3 {
+    color: rgb(19, 0, 87);
+}
+
 .section {
     margin-bottom: 30px;
-    background: #fff;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+.section.card {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
+    color: black;
 }
+
 th, td {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
+
 th {
     background-color: #f5f5f5;
+    color: rgb(255, 0, 179);
 }
+
 .send-message-form {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
+
 input, textarea {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
 }
+
+input::placeholder, textarea::placeholder {
+    color: #888;
+}
+
 button {
     padding: 8px 16px;
-    background-color: #007bff;
+    background: linear-gradient(to right, rgb(198, 0, 198), rgb(0, 200, 255));
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    transition: background 0.3s ease;
 }
+
 button:hover {
-    background-color: #0056b3;
+    background: linear-gradient(to left, rgb(198, 0, 198), rgb(0, 200, 255));
 }
+
 .error {
     color: red;
     margin-bottom: 10px;
@@ -53,6 +98,7 @@ button:hover {
     border-radius: 4px;
     display: none;
 }
+
 .success {
     color: green;
     margin-bottom: 10px;
@@ -61,29 +107,23 @@ button:hover {
     border-radius: 4px;
     display: none;
 }
+
 .message-row {
     transition: background-color 0.3s;
 }
+
 .message-row:hover {
     background-color: #f8f9fa;
 }
+
 .message-content {
     max-width: 300px;
     overflow-wrap: break-word;
 }
+
 .timestamp {
     font-size: 0.9em;
     color: #666;
-}
-
-body {
-    background-color: #f0f2f5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .form-container {
@@ -95,17 +135,12 @@ body {
 }
 
 .form-box {
-    background-color: white;
-    padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     max-width: 400px;
     width: 100%;
 }
 
 h2 {
     margin-bottom: 20px;
-    color: #333;
     text-align: center;
 }
 
@@ -119,9 +154,7 @@ label {
     color: #555;
 }
 
-input[type="text"],
-input[type="password"],
-input[type="email"] {
+input[type="text"], input[type="password"], input[type="email"] {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
@@ -132,16 +165,28 @@ input[type="email"] {
 .btn {
     width: 100%;
     padding: 10px;
-    background-color: #007bff;
+    background: linear-gradient(to right, rgb(198, 0, 198), rgb(0, 200, 255));
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background 0.3s ease;
 }
-
+.btnlogout {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(to right, rgb(198, 0, 198), rgb(255, 0, 0));
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+.btnlogout:hover {
+    background: linear-gradient(to left, rgb(198, 0, 0), rgb(177, 0, 145));
+}
 .btn:hover {
-    background-color: #0056b3;
+    background: linear-gradient(to left, rgb(198, 0, 198), rgb(42, 209, 255));
 }
 
 .switch-form {
@@ -150,7 +195,7 @@ input[type="email"] {
 }
 
 .switch-form a {
-    color: #007bff;
+    color: rgb(25, 0, 135);
     text-decoration: none;
 }
 

@@ -1,69 +1,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard</title>
+    <title>App1 - ChatHive</title>
     {% load static %}
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-   
 </head>
-<body>
+<body style="background: url('{% static 'images/chathivebackground.png' %}') no-repeat center center fixed; background-size: cover;">
     <div class="container">
-        <h1>App2</h1>
-        <div id="error-message" class="error"></div>
-        <div id="success-message" class="success"></div>
-        
-        <!-- Users Section -->
-        <div class="section">
-            <h2>Active Users</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="users-table"></tbody>
-            </table>
-        </div>
+        <!-- Header Section -->
+        <header style="text-align: center; padding: 20px; margin-bottom: 30px; border-radius: 8px;">
+            <img src="{% static 'images/chathivelogo.png' %}" alt="ChatHive Logo" style="height: 100px; margin-bottom: 5px;">
+            <h1 style="color: rgb(19, 0, 87); font-size: 1.5em; margin: 0;">Welcome to ChatHive 2</h1>
+        </header>
 
-        <!-- Messages Section -->
-        <div class="section">
-            <h2>Messages</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Message</th>
-                        <th>Time</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="messages-table"></tbody>
-            </table>
-        </div>
+        <!-- Main Content -->
+        <main>
+            <!-- Active Users and Messages Sections -->
+            <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-bottom: 30px;">
+                <!-- Active Users Section -->
+                <section class="section card" style="flex: 1; min-width: 400px; max-width: 45%; text-align: center;">
+                    <h2>Active Users</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table"></tbody>
+                    </table>
+                </section>
 
-        <!-- Send Message Section -->
-        <div class="section">
-            <h3>Send a Message</h3>
-            <form id="sendMessageForm" class="send-message-form">
-                <input type="text" id="receiver" placeholder="Receiver's Username" required>
-                <textarea id="content" rows="4" placeholder="Type your message..." required></textarea>
-                <button type="submit">Send Message</button>
-            </form>
-        </div>
+                <!-- Messages Section -->
+                <section class="section card" style="flex: 1; min-width: 400px; max-width: 45%; text-align: center;">
+                    <h2>Messages</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Message</th>
+                                <th>Time</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="messages-table"></tbody>
+                    </table>
+                </section>
+            </div>
 
-        <!-- Logout Button -->
-        <form id="logoutForm" action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit">Logout</button>
-        </form>
+            <!-- Send Message Section -->
+            <section class="section card" style="text-align: center; margin-bottom: 30px;">
+                <h3>Send a Message</h3>
+                <form id="sendMessageForm" class="send-message-form" style="max-width: 600px; margin: 0 auto;">
+                    <input type="text" id="receiver" placeholder="Receiver's Username" required>
+                    <textarea id="content" rows="4" placeholder="Type your message..." required></textarea>
+                    <button type="submit" class="btn">Send Message</button>
+                </form>
+            </section>
+
+            <!-- Logout Button -->
+            <section class="section card" style="flex: 1; min-width: 50px; max-width: 50%; text-align: center; padding: 10px">
+                <form id="logoutForm" action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btnlogout">Logout</button>
+                </form>
+            </section>
+        </main>
     </div>
 
     <script src="{% static 'script/send_message.js' %}"></script>
-    <script>
-        
-    </script>
 </body>
 </html>
