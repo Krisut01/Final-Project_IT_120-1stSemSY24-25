@@ -1,69 +1,185 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard</title>
+    <title>DataSync Dashboard</title>
     {% load static %}
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>App2</h1>
-        <div id="error-message" class="error"></div>
-        <div id="success-message" class="success"></div>
-        
-        <!-- Users Section -->
-        <div class="section">
-            <h2>Active Users</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="users-table"></tbody>
-            </table>
-        </div>
-
-        <!-- Messages Section -->
-        <div class="section">
-            <h2>Messages</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Message</th>
-                        <th>Time</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="messages-table"></tbody>
-            </table>
-        </div>
-
-        <!-- Send Message Section -->
-        <div class="section">
-            <h3>Send a Message</h3>
-            <form id="sendMessageForm" class="send-message-form">
-                <input type="text" id="receiver" placeholder="Receiver's Username" required>
-                <textarea id="content" rows="4" placeholder="Type your message..." required></textarea>
-                <button type="submit">Send Message</button>
+    <div class="container dashboard-container">
+        <!-- Header Section -->
+        <div class="dashboard-header">
+            <div class="header-left">
+                <i class="fas fa-sync-alt header-icon rotating"></i>
+                <h1>DataSync Dashboard</h1>
+            </div>
+            <form id="logoutForm" action="{% url 'logout' %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
             </form>
         </div>
 
-        <!-- Logout Button -->
-        <form id="logoutForm" action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <button type="submit">Logout</button>
-        </form>
+        <div id="error-message" class="error"></div>
+        <div id="success-message" class="success"></div>
+        
+        <!-- Main Content Grid -->
+        <div class="dashboard-grid">
+            <!-- Users Section -->
+            <div class="section users-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-database"></i> Active Users</h2>
+                    <span class="sync-status">
+                        <i class="fas fa-circle status-icon"></i>
+                        Real-time Sync
+                    </span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Messages Section -->
+            <div class="section messages-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-exchange-alt"></i> Data Exchange</h2>
+                    <span class="sync-status">
+                        <i class="fas fa-circle status-icon"></i>
+                        Synced
+                    </span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Message</th>
+                                <th>Time</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="messages-table"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Send Message Section -->
+            <div class="section compose-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-share-alt"></i> Share Data</h3>
+                </div>
+                <form id="sendMessageForm" class="send-message-form">
+                    <div class="input-group">
+                        <i class="fas fa-user input-icon"></i>
+                        <input type="text" id="receiver" placeholder="Recipient's Username" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-code input-icon"></i>
+                        <textarea id="content" rows="4" placeholder="Enter data to sync..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn send-btn">
+                        <i class="fas fa-sync"></i>
+                        Sync Data
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Status Footer -->
+        <div class="dashboard-footer">
+            <div class="sync-info">
+                <i class="fas fa-clock"></i>
+                <span>Last synced: <time id="lastSync">Just now</time></span>
+            </div>
+            <div class="sync-status-wrapper">
+                <span class="status-badge online">
+                    <i class="fas fa-plug"></i>
+                    Connected
+                </span>
+            </div>
+        </div>
     </div>
 
     <script src="{% static 'script/send_message.js' %}"></script>
-    <script>
-        
-    </script>
+    
+    <style>
+        /* Additional DataSync specific styles */
+        .rotating {
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--success-color);
+        }
+
+        .status-icon {
+            font-size: 0.8rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .dashboard-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .sync-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-light);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .status-badge.online {
+            background-color: rgba(0, 200, 83, 0.1);
+            color: var(--success-color);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
 </body>
 </html>
