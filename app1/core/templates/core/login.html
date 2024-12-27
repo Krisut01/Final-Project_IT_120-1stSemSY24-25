@@ -3,30 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login - Secure Messaging Platform</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="form-container">
         <div class="form-box">
-            <h2>App1</h2>
-            <form id="loginForm">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" name="username" required>
+            <!-- Added Logo and Title Section -->
+            <div class="logo-section">
+                <div class="app-logo">
+                    <i class="fas fa-shield-alt"></i>
                 </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+                <h1 class="app-title">SecureConnect</h1>
+                <p class="app-subtitle">Secure Messaging Platform</p>
+            </div>
+
+            <!-- Enhanced Login Form -->
+            <div class="login-section">
+                <h2>Welcome Back</h2>
+                <p class="login-subtitle">Sign in to your account</p>
+
+                <form id="loginForm">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="input-group">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                            <i class="fas fa-eye-slash toggle-password"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" name="remember">
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-password">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn login-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <span>or</span>
                 </div>
-                <button type="submit" class="btn">Login</button>
-            </form>
-            <p class="switch-form">Don't have an account? <a href="{% url 'register_form' %}">Register</a></p>
+
+                <p class="switch-form">
+                    New to SecureConnect? 
+                    <a href="{% url 'register_form' %}" class="register-link">
+                        Create an account
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </p>
+            </div>
+
+            <!-- Added Footer Section -->
+            <div class="form-footer">
+                <p class="security-note">
+                    <i class="fas fa-lock security-icon"></i>
+                    End-to-end encrypted messaging
+                </p>
+            </div>
         </div>
     </div>
+
+    <!-- Add these styles to your existing CSS or create a new section -->
+    <style>
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .app-logo {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .app-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .app-subtitle {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .login-subtitle {
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            color: var(--text-light);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            padding-left: 40px;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem 0;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .forgot-password {
+            color: var(--secondary-color);
+            font-size: 0.9rem;
+        }
+
+        .login-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+            margin: 1.5rem 0;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background-color: var(--text-light);
+            opacity: 0.2;
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        .divider span {
+            background-color: white;
+            padding: 0 1rem;
+            color: var(--text-light);
+        }
+
+        .register-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .security-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 2rem;
+        }
+
+        .security-icon {
+            color: var(--success-color);
+        }
+    </style>
 
     <script>
         document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -56,6 +244,22 @@
                 console.error('Error:', error);
                 alert('An error occurred during login');
             });
+        });
+
+        // Add password toggle functionality
+        document.querySelector('.toggle-password').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            }
         });
     </script>
 </body>
